@@ -7,7 +7,12 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(TUTORIALS
+        tutorials/android_oboe.cc
+        tutorials/audio_property.cc
+        tutorials/mac_audio.cc
         tutorials/memory_allocate.cc
+        tutorials/oscillator_generate.cc
+        tutorials/smart_pointer.cc
         )
 
 foreach (TUTORIAL ${TUTORIALS})
