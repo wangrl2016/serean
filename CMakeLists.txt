@@ -15,6 +15,7 @@ add_library(serean STATIC)
 target_sources(serean
         PRIVATE
         audio/source/oscillator.cc
+        audio/source/synth_sound.cc
 )
 
 set(TUTORIALS
