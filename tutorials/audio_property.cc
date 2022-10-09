@@ -6,7 +6,7 @@
 // 安装：pip3 install conan
 // export PATH=${PATH}:/Users/wr/Library/Python/3.9/bin
 // source ~/.zprofile
-// 验证：conan --veriosn
+// 验证：conan --version
 // 2. 编写conanfile.txt文件
 // 编译目录执行：conan install .. --build=missing
 // 3. 修改CMakeList.txt文件引入FFmpeg库
@@ -17,6 +17,7 @@
 // 6. 音频声道
 // 7. 采样率（重采样）
 // 8. 采样格式
+// 9. 音频大小计算
 
 #include <iostream>
 
@@ -40,6 +41,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
     const char* fmt_name = av_get_sample_fmt_name(
             AV_SAMPLE_FMT_FLT);
     std::cout << fmt_name << std::endl;
+
+    // 音频大小计算
+    // 总大小 = 采样率 x 位深度 x 声道数 x 秒数
 
     return 0;
 }

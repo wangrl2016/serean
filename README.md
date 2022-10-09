@@ -27,12 +27,11 @@
 19. 老奶奶丰收的喜悦，挑着百斤稻谷小步快跑（被遗忘的山村11）
 20. 稻谷旱成草，孙女考上公务员，用古老的赣语与老爷爷交流（被遗忘的山村12）
 21. 最终的归宿，心灵的港湾，健康的身体，我对家乡深沉的爱（被遗忘的山村13）
-
 22. [C语言malloc函数族以及memcpy/memset函数介绍](tutorials/memory_relate.cc)（节拍器2）
-23. [C++智能指针shared_ptr/unique_ptr介绍](tutorials/smart_pointer.cc)（节拍器3）
-24. [结合FFmpeg讲解音频基本三要素：声道、采样率、采样格式](tutorials/audio_property.cc)（节拍器4）
+23. [C++智能指针以及引用计数原理实现](tutorials/smart_pointer.cc)（节拍器3）
+24. [结合FFmpeg讲解数字音频基本三要素：声道、采样率、采样格式](tutorials/audio_property.cc)（节拍器4）
 25. [产生有节奏的声音，编写音频波形生成器](tutorials/oscillator_generate.cc)（节拍器5）
-26. [macOS使用底层AudioUnit库进行声音播放](tutorials/mac_audio.cc) (节拍器6)
+26. [macOS使用底层AudioUnit库进行声音播放](tutorials/mac_audio_unit.cc) (节拍器6)
 27. [将macOS上的节拍器器移植进Android手机](tutorials/android_oboe.cc)（节拍器7）
 
 28. 音频格式数据转换
