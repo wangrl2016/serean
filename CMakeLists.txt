@@ -23,6 +23,7 @@ set(TUTORIALS
         tutorials/mac_audio_unit.cc
         tutorials/memory_relate.cc
         tutorials/smart_pointer.cc
+        tutorials/ppm_image.cc
         )
 
 foreach (TUTORIAL ${TUTORIALS})

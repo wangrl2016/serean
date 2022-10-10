@@ -11,8 +11,14 @@
 
 #include "audio/source/oscillator.h"
 
+// 节拍器
+// 1. 波形生成器
+// 正弦波：周期、振幅
+// 2. 按照固定的周期播放波形
+// 代码地址：https://github.com/wangrl2016/serean.git
+
 constexpr int kDefaultSampleRate = 44100;
-constexpr int kHighFrequency = 600;
+constexpr int kHighFrequency = 800;
 constexpr int kLowFrequency = 400;
 constexpr int kMaxFrameNum = 4096;
 
@@ -85,7 +91,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
     // 每一帧的字节数
     description.mBytesPerFrame = sizeof(Float32) * description.mChannelsPerFrame;
     // 每一包的字节数
-    description.mBytesPerPacket = description.mFramesPerPacket * description.mBytesPerFrame;
+    description.mBytesPerPacket = description.mFramesPerPacket
+            * description.mBytesPerFrame;
     description.mBitsPerChannel = 8 * sizeof(Float32);
     description.mReserved = 0;
 

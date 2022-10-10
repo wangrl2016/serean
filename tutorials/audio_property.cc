@@ -8,11 +8,11 @@
 // source ~/.zprofile
 // 验证：conan --version
 // 2. 编写conanfile.txt文件
-// 编译目录执行：conan install .. --build=missing
 // 3. 修改CMakeList.txt文件引入FFmpeg库
 // 增加${CONAN_LIBS}
 // include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 // conan_basic_setup()
+// 编译目录执行：conan install .. --build=missing
 // 4. 引入FFmpeg函数验证安装成功
 // 6. 音频声道
 // 7. 采样率（重采样）
