@@ -1,5 +1,6 @@
 [requires]
 ffmpeg/5.0
+opencv/4.5.5
 
 [generators]
 cmake
@@ -11,3 +12,4 @@ ffmpeg:with_openh264=False
 ffmpeg:with_openjpeg=False
 ffmpeg:with_opus=False
 ffmpeg:with_vorbis=False
+opencv:with_ffmpeg=False

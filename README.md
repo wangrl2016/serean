@@ -29,42 +29,9 @@
 21. 最终的归宿，心灵的港湾，健康的身体，我对家乡深沉的爱（被遗忘的山村13）
 22. [C语言malloc函数族以及memcpy/memset函数介绍](tutorials/memory_relate.cc)（节拍器2）
 23. [C++智能指针以及引用计数原理实现](tutorials/smart_pointer.cc)（节拍器3）
-24. [结合FFmpeg讲解数字音频基本三要素：声道、采样率、采样格式](tutorials/audio_property.cc)（节拍器4）
-25. [产生有节奏的声音，编写音频波形生成器](tutorials/oscillator_generate.cc)（节拍器5）
-26. [macOS使用底层AudioUnit库进行声音播放](tutorials/mac_audio_unit.cc) (节拍器6)
-27. [将macOS上的节拍器器移植进Android手机](tutorials/android_oboe.cc)（节拍器7）
-
-28. 音频格式数据转换
-29. WAV数据格式解码
-30. WAV数据格式编码
-31. 容器概念介绍
-32. 编解码概念介绍
-33. MP3编码格式
-34. AAC编码格式
-35. 各种音频容器解析
-36. Conan包管理器
-37. Git使用
-38. 图片PBM格式
-39. PNG格式介绍
-40. H264格式介绍
-41. FFmpeg基本操作
-42. FFmpeg音频解码
-43. FFmpeg音频编码
-44. FFmpeg视频解码
-45. FFmpeg视频编码
-46. SDL介绍
-47. FFmpeg播放器
-48. Demux Decode
-49. Encode Mux
-50. Transcode AAC
-51. Resample Audio
-52. Memory Read
-53. Time Stretch
-54. 流媒体
-55. Github上各种库
-56. OpenGL
-57. OpenCV
-58. TensorFlow
-59. 算法
-60. 计算机系统
+24. 简化C++库的引用过程，Conan包管理器的安装与使用
+25. [结合FFmpeg讲解数字音频三要素：声道、采样率、采样格式](tutorials/audio_property.cc)（节拍器4）
+26. [产生有节奏的声音，编写音频波形生成器](tutorials/oscillator_generate.cc)（节拍器5）
+27. [使用macOS系统AudioUnit库进行声音播放](tutorials/mac_audio_unit.cc) (节拍器6)
+28. [将macOS上的节拍器器移植进Android手机](tutorials/android_oboe.cc)（节拍器7）
 
