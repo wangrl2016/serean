@@ -6,6 +6,22 @@
 #include <fstream>
 #include <tuple>
 
+// 数字图像基础
+//
+// 1. 色彩原理和生成PPM彩色图像
+//
+// Introduction to OpenCV
+// 2. OpenCV库的安装和介绍
+//
+// The Core Functionality (core module)
+// 3. 讲解Mat核心数据结构
+// 4. 几种快速遍历矩阵的方法
+// 5. 锐化
+// 6. 图像的操作
+// 7. 两张图片叠加
+// 8. 改变图片的对比度和亮度
+// 9. 离散傅立叶变换
+//
 // 1. 三原色原理
 // 三原色光模式（RGB color model），又称RGB颜色模型或红绿蓝颜色模型，
 // 是一种加色模型，将红（Red）、绿（Green）、蓝（Blue）三原色的色光以不同的比例相加，
