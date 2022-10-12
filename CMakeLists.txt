@@ -10,6 +10,7 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
 include_directories(${CMAKE_SOURCE_DIR})
+include_directories(${CONAN_INCLUDE_DIRS})
 
 add_library(serean STATIC)
 target_sources(serean
@@ -22,6 +23,7 @@ set(TUTORIALS
         tutorials/audio_property.cc
         tutorials/mac_audio_unit.cc
         tutorials/memory_relate.cc
+        tutorials/opencv_core_func.cc
         tutorials/smart_pointer.cc
         tutorials/ppm_image.cc
         )
@@ -29,6 +31,6 @@ set(TUTORIALS
 foreach (TUTORIAL ${TUTORIALS})
     string(REGEX MATCHALL "[0-9A-Za-z_]*.cc" temp ${TUTORIAL})
     string(REGEX REPLACE ".cc" "" EXE ${temp})
-    add_executable(${EXE} ${TUTORIAL})
+    add_executable(${EXE} ${TUTORIAL} tutorials/opencv_core_func.cc)
     target_link_libraries(${EXE} serean ${CONAN_LIBS})
 endforeach ()
