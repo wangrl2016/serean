@@ -12,6 +12,15 @@ using namespace cv;
 int main(int argc, char* argv[]) {
     // 倒序查看示例
 
+    // 1. 数字设备获取图像
+    // 2. Mat结构体的两大部分：
+    // 矩阵头包含矩阵的大小，指向像素值的指针
+    // 实体数据
+    // 3. 自动管理内存
+    // 使用clone()和copyTo()进行数据复制
+    // 4. 储存的数据有RGB, HLS, YCrCb
+    // 数据格式：CV_8UC3, CV_64F
+    // 5. 介绍Mat提供的函数
     {
         std::cout << "This program shows how to create matrices(cv::Mat)"
                      "in OpenCV and its serial out capabilities" << std::endl;
@@ -46,7 +55,8 @@ int main(int argc, char* argv[]) {
         std::cout << "C = " << std::endl << " " << C << std::endl << std::endl;
 
         Mat RowClone = C.row(1).clone();
-        std::cout << "RowClone = " << std::endl << " " << RowClone << std::endl << std::endl;
+        std::cout << "RowClone = " << std::endl << " "
+                  << RowClone << std::endl << std::endl;
 
         Point2f P(5, 1);
         std::cout << "Point (2D) = " << P << std::endl << std::endl;
@@ -58,7 +68,8 @@ int main(int argc, char* argv[]) {
         v.push_back((float) CV_PI);
         v.push_back(2);
         v.push_back(3.01f);
-        std::cout << "Vector of floats via Mat = " << Mat(v) << std::endl << std::endl;
+        std::cout << "Vector of floats via Mat = " << Mat(v)
+                  << std::endl << std::endl;
 
         std::vector<Point2f> vPoints(20);
         for (size_t i = 0; i < vPoints.size(); ++i)
