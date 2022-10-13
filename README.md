@@ -31,7 +31,10 @@
 23. [C++智能指针以及引用计数原理实现](tutorials/smart_pointer.cc)（节拍器3）
 24. 简化C++库的引用过程，Conan包管理器的安装与使用
 25. [结合FFmpeg讲解数字音频三要素：声道、采样率、采样格式](tutorials/audio_property.cc)（节拍器4）
-26. [产生有节奏的声音，编写音频波形生成器](tutorials/oscillator_generate.cc)（节拍器5）
+26. [产生有节奏的声音，编写音频波形生成器](audio/source/oscillator.cc)（节拍器5）
 27. [使用macOS系统AudioUnit库进行声音播放](tutorials/mac_audio_unit.cc) (节拍器6)
-28. [将macOS上的节拍器器移植进Android手机](tutorials/android_oboe.cc)（节拍器7）
+28. 编写高性能的音乐游戏，Android系统Oboe音频库介绍
+29. 数字图像基础导读，通过OpenCV学习图像算法（数字图像基础1）
+30. [介绍三原色光模式以及生成PPM图像](tutorials/ppm_image.cc)（数字图像基础2）
+31. [使用包管理器安装OpenCV库，以及导入、显示、保存图片](tutorials/opencv_core_func.cc)（数字图像基础3）
 

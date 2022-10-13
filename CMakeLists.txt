@@ -31,6 +31,6 @@ set(TUTORIALS
 foreach (TUTORIAL ${TUTORIALS})
     string(REGEX MATCHALL "[0-9A-Za-z_]*.cc" temp ${TUTORIAL})
     string(REGEX REPLACE ".cc" "" EXE ${temp})
-    add_executable(${EXE} ${TUTORIAL} tutorials/opencv_core_func.cc)
+    add_executable(${EXE} ${TUTORIAL})
     target_link_libraries(${EXE} serean ${CONAN_LIBS})
 endforeach ()
