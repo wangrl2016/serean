@@ -5,6 +5,7 @@
 #include <iostream>
 #include <opencv4/opencv2/core.hpp>
 #include <opencv4/opencv2/imgcodecs.hpp>
+#include <opencv4/opencv2/imgproc.hpp>
 #include <opencv4/opencv2/highgui.hpp>
 
 using namespace cv;
@@ -87,8 +88,84 @@ Mat& ScanImageAndReduceRandomAccess(Mat& I, const uchar* const table) {
     return I;
 }
 
+void Sharpen(const Mat& my_image, Mat& result) {
+    CV_Assert(my_image.depth() == CV_8U);
+    const int n_channels = my_image.channels();
+    result.create(my_image.size(), my_image.type());
+
+    for (int j = 1; j < my_image.rows - 1; ++j) {
+        const auto* previous = my_image.ptr<uchar>(j - 1);
+        const auto* current = my_image.ptr<uchar>(j);
+        const auto* next = my_image.ptr<uchar>(j + 1);
+        auto* output = result.ptr<uchar>(j);
+        for (int i = n_channels; i < n_channels * (my_image.cols - 1); ++i) {
+            *output++ = saturate_cast<uchar>(5 * current[i]
+                                             - current[i - n_channels]
+                                             - current[i + n_channels]
+                                             - previous[i]
+                                             - next[i]);
+        }
+    }
+
+    result.row(0).setTo(Scalar(0));
+    result.row(result.rows - 1).setTo(Scalar(0));
+    result.col(0).setTo(Scalar(0));
+    result.col(result.cols - 1).setTo(Scalar(0));
+}
+
 int main(int argc, char* argv[]) {
     // 倒序查看示例
+
+    // 手写锐化函数
+    // 需要mask matrix
+    {
+        std::cout << "This program shows how to filter images"
+                     "with mask: the write it yourself and the"
+                     "filter2d way." << std::endl;
+
+        const char* filename = argc >= 2 ? argv[1] : "lena.jpg";
+
+        Mat src, dst0, dst1;
+        if (argc >= 3 && !strcmp("G", argv[2]))
+            src = imread(samples::findFile(filename),
+                         IMREAD_GRAYSCALE);
+        else
+            src = imread(samples::findFile(filename),
+                         IMREAD_COLOR);
+        if (src.empty()) {
+            std::cerr << "Can not open image [" << filename << "]" << std::endl;
+            return EXIT_FAILURE;
+        }
+
+        namedWindow("Input", WINDOW_AUTOSIZE);
+        namedWindow("Output", WINDOW_AUTOSIZE);
+        imshow("Input", src);
+        auto t = (double) getTickCount();
+        Sharpen(src, dst0);
+
+        t = ((double) getTickCount() - t) / getTickFrequency();
+        std::cout << "Hand written function time passed"
+                     "in seconds: " << t << std::endl;
+
+        imshow("Output", dst0);
+        waitKey();
+
+        Mat kernel = (Mat_<char>(3, 3) <<
+                                       0, -1, 0,
+                -1, 5, -1,
+                0, -1, 0);
+        t = (double) getTickCount();
+        filter2D(src, dst1, src.depth(), kernel);
+        t = ((double) getTickCount() - t) / getTickFrequency();
+        std::cout << "Built-in filter2D time passed"
+                     "in seconds:     " << t << std::endl;
+
+        imshow("Output", dst1);
+        int k = waitKey();
+        if (k == 's') {
+            imwrite("lena.jpeg", dst1);
+        }
+    }
 
     // 矩阵遍历的四种方法
     // 1. The efficient way
@@ -183,7 +260,8 @@ int main(int argc, char* argv[]) {
         t = 1000 * ((double) getTickCount() - t) / getTickFrequency();
         t /= times;
 
-        std::cout << "Time of reducing with the on-the-fly address generation - at function (averaged for "
+        std::cout << "Time of reducing with the on-the-fly address"
+                     "generation - at function (averaged for "
                   << times << " runs): " << t << " milliseconds." << std::endl;
 
         Mat look_up_table(1, 256, CV_8U);
