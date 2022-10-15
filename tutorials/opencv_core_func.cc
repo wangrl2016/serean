@@ -116,6 +116,87 @@ void Sharpen(const Mat& my_image, Mat& result) {
 int main(int argc, char* argv[]) {
     // 倒序查看示例
 
+    // 1. 图像混合
+    // g(x)=(1−α)f0(x)+αf1(x)
+    // alpha value [0.0-1.0]
+    // 2. 对比度和亮度
+    // g(x)=αf(x)+β
+    // alpha value [1.0-3.0]
+    // beta value [0-100]
+    // 3. 拼接图像
+    {
+        Mat image = imread(samples::findFile(argv[1]));
+        if (image.empty()) {
+            std::cout << "Could not open or find the image!\n" << std::endl;
+            std::cout << "Usage: " << argv[0] << " <Input image>" << std::endl;
+            return -1;
+        }
+
+        Mat new_image = Mat::zeros(image.size(), image.type());
+        double alpha = 2.0;     // simple contrast control
+        int beta = 50;          // Simple brightness control
+
+        for (int y = 0; y < image.rows; y++) {
+            for (int x = 0; x < image.cols; x++) {
+                for (int c = 0; c < image.channels(); c++) {
+                    new_image.at<Vec3b>(y, x)[c] =
+                            saturate_cast<uchar>(
+                                    alpha * image.at<Vec3b>(
+                                            y, x)[c] + beta);
+                }
+            }
+        }
+
+        int channels = image.channels();
+        Mat merge_image = Mat::zeros(image.rows,
+                                     image.cols * 2,
+                                     image.type());
+        for (int y = 0; y < image.rows; y++) {
+            for (int x = 0; x < image.cols * 2; x++) {
+                if (x < image.cols) {
+                    for (int c = 0; c < channels; c++) {
+                        merge_image.at<Vec3b>(y, x)[c] =
+                                image.at<Vec3b>(y, x)[c];
+                    }
+                } else {
+                    for (int c = 0; c < channels; c++) {
+                        merge_image.at<Vec3b>(y, x)[c] =
+                                new_image.at<Vec3b>(
+                                        y, x - image.cols)[c];
+                    }
+                }
+            }
+        }
+
+        imwrite("merge_image.jpeg", merge_image);
+    }
+
+    {
+        double alpha = 0.5;
+        double beta;
+
+        Mat src1, src2, dst;
+        std::cout << "Simple Linear Blender " << std::endl;
+
+        src1 = imread(samples::findFile(argv[1]));
+        src2 = imread(samples::findFile(argv[2]));
+
+        if (src1.empty()) {
+            std::cout << "Error loading src1" << std::endl;
+            return EXIT_FAILURE;
+        }
+        if (src2.empty()) {
+            std::cout << "Error loading src2" << std::endl;
+            return EXIT_FAILURE;
+        }
+
+        beta = (1.0 - alpha);
+        addWeighted(src1, alpha, src2, beta, 0.0, dst);
+        imwrite("blend.jpeg", dst);
+        imshow("Linear Blend", dst);
+        waitKey(0);
+    }
+
     // 手写锐化函数
     // 需要mask matrix
     {
