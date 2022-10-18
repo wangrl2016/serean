@@ -17,6 +17,7 @@ target_sources(serean
         PRIVATE
         audio/source/oscillator.cc
         audio/source/synth_sound.cc
+        media/base/bit_reader.cc
         media/base/bit_reader_core.cc
         media/base/container_names.cc
 )
@@ -37,3 +38,19 @@ foreach (TUTORIAL ${TUTORIALS})
     add_executable(${EXE} ${TUTORIAL})
     target_link_libraries(${EXE} serean ${CONAN_LIBS})
 endforeach ()
+
+# 单元测试
+enable_testing()
+
+add_executable(
+        serean_unittest
+        media/base/bit_reader_unittest.cc
+)
+target_link_libraries(
+        serean_unittest
+        serean
+        ${CONAN_LIBS}
+)
+
+include(GoogleTest)
+gtest_discover_tests(serean_unittest)
