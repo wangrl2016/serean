@@ -17,6 +17,8 @@ target_sources(serean
         PRIVATE
         audio/source/oscillator.cc
         audio/source/synth_sound.cc
+        media/base/bit_reader_core.cc
+        media/base/container_names.cc
 )
 
 set(TUTORIALS

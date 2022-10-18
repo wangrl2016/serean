@@ -8,6 +8,8 @@ ffmpeg/5.0
 opencv/4.5.5
 sdl/2.24.1
 sdl_image/2.0.5
+gtest/1.11.0
+glog/0.5.0
 
 [generators]
 cmake
