@@ -2,7 +2,9 @@
 // Created by admin on 2022/10/17.
 //
 
+#include <string>
 #include <SDL.h>
+#include <SDL_image.h>
 
 // 1. 使用SDL进行游戏开发系列介绍
 // https://lazyfoo.net/tutorials/SDL/
@@ -80,6 +82,31 @@ SDL_Surface* LoadSurface(const char* path) {
                path, SDL_GetError());
     return surface;
 }
+
+// 加载PNG等图片
+//SDL_Surface* LoadSurface(const std::string& path) {
+//    // The final optimized image.
+//    SDL_Surface* optimized_surface = nullptr;
+//
+//    // Load image at specified path.
+//    SDL_Surface* loaded_surface = IMG_Load(path.c_str());
+//    if (loaded_surface == nullptr) {
+//        printf("Unable to load image %s! SDL_image error: %s\n",
+//               path.c_str(), IMG_GetError());
+//    } else {
+//        // Convert surface to screen format
+//        optimized_surface = SDL_ConvertSurface(loaded_surface,
+//                                               screen_surface->format,
+//                                               0);
+//        if (optimized_surface == nullptr) {
+//            printf("Unable to optimize image %s! SDL error:%s\n",
+//                   path.c_str(), SDL_GetError());
+//        }
+//        // Get rid of old loaded surface
+//        SDL_FreeSurface(loaded_surface);
+//    }
+//    return optimized_surface;
+//}
 
 bool LoadMedia(const char* file_press,
                const char* file_up,
@@ -208,6 +235,18 @@ int main(int argc, char* argv[]) {
                 // apple the image
                 SDL_BlitSurface(current_surface, nullptr,
                                 screen_surface, nullptr);
+
+                // Apply the image stretched
+                // 将图片放大到指定大小
+                // SDL_Rect stretch_rect;
+                // stretch_rect.x = 0;
+                // stretch_rect.y = 0;
+                // stretch_rect.w = kScreenWidth;
+                // stretch_rect.h = kScreenHeight;
+                // SDL_BlitScaled(current_surface,
+                //                nullptr,
+                //                screen_surface,
+                //                &stretch_rect);
 
                 // update the surface
                 SDL_UpdateWindowSurface(window);
