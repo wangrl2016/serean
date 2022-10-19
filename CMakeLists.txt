@@ -45,6 +45,7 @@ enable_testing()
 
 add_executable(
         serean_unittest
+        base/containers/queue_unittest.cc
         media/base/bit_reader_unittest.cc
 )
 target_link_libraries(

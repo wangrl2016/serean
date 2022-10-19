@@ -62,8 +62,60 @@ namespace media::container_names {
 
         int offset = 0;
         int valid_top_level_boxes = 0;
+        while (offset + 8 < buffer_size) {
+            uint32_t atom_size = Read32(buffer + offset);
+            uint32_t atom_type = Read32(buffer + offset + 4);
+
+            // Only need to check for atoms that are valid at the top level. However,
+            // "Boxes with an unrecognized type shall be ignored and skipped." So
+            // simply make sure that at least two recognized top level boxes are found.
+            // This list matches BoxReader::IsValidTopLevelBox().
+            switch (atom_type) {
+                case TAG('f', 't', 'y', 'p'):
+                case TAG('p', 'd', 'i', 'n'):
+                case TAG('b', 'l', 'o', 'c'):
+                case TAG('m', 'o', 'o', 'v'):
+                case TAG('m', 'o', 'o', 'f'):
+                case TAG('m', 'f', 'r', 'a'):
+                case TAG('m', 'd', 'a', 't'):
+                case TAG('f', 'r', 'e', 'e'):
+                case TAG('s', 'k', 'i', 'p'):
+                case TAG('m', 'e', 't', 'a'):
+                case TAG('m', 'e', 'c', 'o'):
+                case TAG('s', 't', 'y', 'p'):
+                case TAG('s', 'i', 'd', 'x'):
+                case TAG('s', 's', 'i', 'x'):
+                case TAG('p', 'r', 'f', 't'):
+                case TAG('u', 'u', 'i', 'd'):
+                case TAG('e', 'm', 's', 'g'):
+                    ++valid_top_level_boxes;
+                    break;
+            }
+
+            if (atom_size == 1) {
+                // Indicates that the length is the next 64bits.
+                if (offset + 16 > buffer_size)
+                    break;
+
+                if (Read32(buffer + offset + 8) != 0)
+                    break;  // offset is way past buffer size.
+                atom_size = Read32(buffer + offset + 12);
+            }
+
+            if (atom_size == 0 || atom_size > static_cast<size_t>(buffer_size))
+                break;  // indicates the last atom or length too big.
+            offset += atom_size;
+        }
 
         return valid_top_level_boxes >= 2;
+    }
+
+    // Attempt to determine the container type from the buffer provided. This is
+    // a simple pass, that uses the first 4 bytes of the buffer as an index to get
+    // a rough idea of the container format.
+    static MediaContainerName LookupContainerByFirst4(const uint8_t* buffer,
+                                                      int buffer_size) {
+
     }
 
     MediaContainerName DetermineContainer(const uint8_t* buffer, int buffer_size) {
@@ -72,6 +124,10 @@ namespace media::container_names {
         // Since MOV/QuickTime/MPEG4 streams are common, check for them first.
         if (CheckMov(buffer, buffer_size))
             return CONTAINER_MOV;
+
+        // Next attempt the simple checks, that typically look at just the
+        // first few bytes of the file.
+        MediaContainerName result = LookupContainerByFirst4(buffer, buffer_size);
 
         return CONTAINER_UNKNOWN;
     }
