@@ -28,7 +28,7 @@ public:
         stopButton.setColour(juce::TextButton::buttonColourId, juce::Colours::red);
         stopButton.setEnabled(false);
 
-        setSize(300, 200);
+        setSize(600, 500);
 
         formatManager.registerBasicFormats();       // [1]
         transportSource.addChangeListener(this);   // [2]
@@ -58,9 +58,9 @@ public:
     }
 
     void resized() override {
-        openButton.setBounds(10, 10, getWidth() - 20, 20);
-        playButton.setBounds(10, 40, getWidth() - 20, 20);
-        stopButton.setBounds(10, 70, getWidth() - 20, 20);
+        openButton.setBounds(10, 10, getWidth() - 20, 60);
+        playButton.setBounds(10, 70, getWidth() - 20, 60);
+        stopButton.setBounds(10, 130, getWidth() - 20, 60);
     }
 
     void changeListenerCallback(juce::ChangeBroadcaster* source) override {
