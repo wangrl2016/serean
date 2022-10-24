@@ -115,7 +115,7 @@ namespace media::container_names {
     // a rough idea of the container format.
     static MediaContainerName LookupContainerByFirst4(const uint8_t* buffer,
                                                       int buffer_size) {
-
+        return CONTAINER_UNKNOWN;
     }
 
     MediaContainerName DetermineContainer(const uint8_t* buffer, int buffer_size) {

@@ -11,6 +11,7 @@ add_subdirectory(JUCE)
 set(EXAMPLES
         audio_input
         audio_player
+        audio_sample_buffer
         )
 
 foreach (EXAMPLE ${EXAMPLES})
