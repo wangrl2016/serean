@@ -31,13 +31,51 @@ public:
         auto* device = deviceManager.getCurrentAudioDevice();
         auto active_input_channels = device->getActiveInputChannels();
         auto active_output_channels = device->getActiveOutputChannels();
-        
+        auto max_input_channels = active_input_channels.getHighestBit() + 1;
+        auto max_output_channels = active_output_channels.getHighestBit() + 1;
+
+        auto level = (float) level_slider_.getValue();
+        for (auto channel = 0; channel < max_output_channels; channel++) {
+            if ((!active_output_channels[channel]) || max_input_channels == 0) {
+                bufferToFill.buffer->clear(channel,
+                                           bufferToFill.startSample,
+                                           bufferToFill.numSamples);
+            } else {
+                auto actual_input_channel = channel % max_input_channels;
+                if (!active_input_channels[channel]) {
+                    bufferToFill.buffer->clear(channel,
+                                               bufferToFill.startSample,
+                                               bufferToFill.numSamples);
+                } else {
+                    auto* in_buffer = bufferToFill.buffer->getReadPointer(actual_input_channel,
+                                                                          bufferToFill.startSample);
+                    auto* out_buffer = bufferToFill.buffer->getWritePointer(channel,
+                                                                            bufferToFill.startSample);
+
+                    for (auto sample = 0; sample < bufferToFill.numSamples; sample++) {
+                        auto noise = (random_.nextFloat() * 2.0f) - 1.0f;
+                        out_buffer[sample] = in_buffer[sample] + (in_buffer[sample] * noise * level);
+                    }
+                }
+            }
+        }
+    }
+
+    void releaseResources() override {
+
+    }
+
+    void resized() override {
+        level_label_.setBounds (10, 10, 90, 20);
+        level_slider_.setBounds (100, 10, getWidth() - 110, 20);
     }
 
 private:
     juce::Random random_;
     juce::Slider level_slider_;
     juce::Label level_label_;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)
 };
 
 
