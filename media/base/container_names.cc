@@ -4,6 +4,7 @@
 
 #include <glog/logging.h>
 #include "media/base/container_names.h"
+#include "media/base/bit_reader.h"
 
 namespace media::container_names {
 
@@ -54,6 +55,21 @@ namespace media::container_names {
                            size_t prefix_size) {
         return (prefix_size <= buffer_size &&
                 memcmp(buffer, prefix, prefix_size) == 0);
+    }
+
+    // Helper function to read up to 64 bits from a bit stream.
+    // TODO: Delete this helper and replace with direct calls to
+    // reader that handle read failure. As-is, we hide failure because returning 0
+    // is valid for both a successful and failed read.
+    static uint64_t ReadBits(BitReader* reader, int num_bits) {
+        DCHECK_GE(reader->bits_available(), num_bits);
+        DCHECK((num_bits > 0) && (num_bits <= 64));
+        uint64_t value = 0;
+
+        if (!reader->ReadBits(num_bits, &value))
+            return 0;
+
+        return value;
     }
 
     // Additional checks for a MOV/QuickTime/MPEG4 container.
@@ -110,11 +126,125 @@ namespace media::container_names {
         return valid_top_level_boxes >= 2;
     }
 
+    // Read a Matroska Element Id.
+    static int GetElementId(BitReader* reader) {
+        // Element ID is coded with the leading zero bits (max 3) determining size.
+        // If it is an invalid encoding or the end of the buffer is reached,
+        // return -1 as a tag that won't be expected.
+        if (reader->bits_available() >= 8) {
+            int num_bits_to_read = 0;
+            static int prefix[] = {0x80, 0x4000, 0x200000, 0x10000000};
+            for (int i = 0; i < 4; i++) {
+                num_bits_to_read += 7;
+                if (ReadBits(reader, 1) == 1) {
+                    if (reader->bits_available() < num_bits_to_read)
+                        break;
+                    // prefix[] adds back the bits read individually.
+                    return ReadBits(reader, num_bits_to_read) | prefix[i];
+                }
+            }
+        }
+        // Invalid encoding, return something not expected.
+        return -1;
+    }
+
+    // Read a Matroska Unsigned Integer (VINT).
+    static uint64_t GetVint(BitReader* reader) {
+        // Values are coded with the leading zero bits (max 7) determining size.
+        // If it is an invalid coding or the end of the buffer is reached,
+        // return something that will go off the end of the buffer.
+        if (reader->bits_available() >= 8) {
+            int num_bits_to_read = 0;
+            for (int i = 0; i < 8; ++i) {
+                num_bits_to_read += 7;
+                if (ReadBits(reader, 1) == 1) {
+                    if (reader->bits_available() < num_bits_to_read)
+                        break;
+                    return ReadBits(reader, num_bits_to_read);
+                }
+            }
+        }
+        // Incorrect format (more than 7 leading 0's) or off the end of the buffer.
+        // Since the return value is used as a byte size, return a value that will
+        // cause a failure when used.
+        return (reader->bits_available() / 8) + 2;
+    }
+
+    static bool CheckWebm(const uint8_t* buffer, int buffer_size) {
+        // Reference: http://www.matroska.org/technical/specs/index.html
+        RCHECK(buffer_size > 12);
+
+        BitReader reader(buffer, buffer_size);
+
+        // Verify starting Element Id.
+        RCHECK(GetElementId(&reader) == 0x1a45dfa3);
+
+        int header_size = GetVint(&reader);
+        RCHECK(reader.bits_available() / 8 >= header_size);
+
+        // Loop through the header.
+        while (reader.bits_available() > 0) {
+            int tag = GetElementId(&reader);
+            int tag_size = GetVint(&reader);
+            switch (tag) {
+                case 0x4286:  // EBMLVersion
+                case 0x42f7:  // EBMLReadVersion
+                case 0x42f2:  // EBMLMaxIdLength
+                case 0x42f3:  // EBMLMaxSizeLength
+                case 0x4287:  // DocTypeVersion
+                case 0x4285:  // DocTypeReadVersion
+                case 0xec:    // void
+                case 0xbf:    // CRC32
+                    RCHECK(reader.bits_available() / 8 >= tag_size);
+                    RCHECK(reader.SkipBits(tag_size * 8));
+                    break;
+
+                case 0x4282:  // EBMLDocType
+                    // Need to see "webm" or "matroska" next.
+                    RCHECK(reader.bits_available() >= 32);
+                    switch (ReadBits(&reader, 32)) {
+                        case TAG('w', 'e', 'b', 'm') :
+                            return true;
+                        case TAG('m', 'a', 't', 'r') :
+                            RCHECK(reader.bits_available() >= 32);
+                            return (ReadBits(&reader, 32) == TAG('o', 's', 'k', 'a'));
+                    }
+                    return false;
+
+                default:  // Unrecognized tag
+                    return false;
+            }
+        }
+        return false;
+    }
+
+    // For some formats the signature is a bunch of characters. They are defined
+    // below. Note that the first 4 characters of the string may be used as a TAG
+    // in LookupContainerByFirst4. For signatures that contain embedded \0, use
+    // uint8_t[].
+    static const char kAmrSignature[] = "#!AMR";
+    static const uint8_t kAsfSignature[] = {0x30, 0x26, 0xb2, 0x75, 0x8e, 0x66,
+                                            0xcf, 0x11, 0xa6, 0xd9, 0x00, 0xaa,
+                                            0x00, 0x62, 0xce, 0x6c};
+    static const char kAssSignature[] = "[Script Info]";
+
     // Attempt to determine the container type from the buffer provided. This is
     // a simple pass, that uses the first 4 bytes of the buffer as an index to get
     // a rough idea of the container format.
     static MediaContainerName LookupContainerByFirst4(const uint8_t* buffer,
                                                       int buffer_size) {
+        // Minimum size that the code expects to exist without checking size.
+        if (buffer_size < kMinimumContainerSize)
+            return CONTAINER_UNKNOWN;
+
+        uint32_t first4 = Read32(buffer);
+        switch (first4) {
+            case 0x1a45dfa3:
+                if (CheckWebm(buffer, buffer_size))
+                    return CONTAINER_WEBM;
+                break;
+        }
+
         return CONTAINER_UNKNOWN;
     }
 
