@@ -10,9 +10,15 @@ add_subdirectory(JUCE)
 
 set(EXAMPLES
         advanced_audio_sample
+        audio_device_manager
         audio_input
+        audio_level
         audio_player
         audio_sample_buffer
+        decibel_level
+        noise_generator
+        wave_synthesiser
+        waveform
         )
 
 foreach (EXAMPLE ${EXAMPLES})
