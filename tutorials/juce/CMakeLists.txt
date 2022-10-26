@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 add_subdirectory(JUCE)
 
 set(EXAMPLES
+        advanced_audio_sample
         audio_input
         audio_player
         audio_sample_buffer

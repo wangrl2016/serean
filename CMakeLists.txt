@@ -28,8 +28,6 @@ set(TUTORIALS
         tutorials/memory_relate.cc
         tutorials/opencv_core_func.cc
         tutorials/smart_pointer.cc
-        tutorials/sdl_feature.cc
-        tutorials/sdl_get_start.cc
         tutorials/ppm_image.cc
         )
 
