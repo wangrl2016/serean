@@ -16,9 +16,16 @@ set(EXAMPLES
         audio_player
         audio_sample_buffer
         decibel_level
+        midi_data
+        midi_event
+        midi_synthesiser
+        mpe
+        mpe_zone
         noise_generator
+        plugin_in
         wave_synthesiser
         waveform
+        wavetable
         )
 
 foreach (EXAMPLE ${EXAMPLES})

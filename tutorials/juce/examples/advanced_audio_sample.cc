@@ -10,6 +10,26 @@ public:
     class ReferenceCountedBuffer : public juce::ReferenceCountedObject {
     public:
         typedef juce::ReferenceCountedObjectPtr<ReferenceCountedBuffer> Ptr;
+
+        ReferenceCountedBuffer(const juce::String& nameToUse,
+                               int numChannels,
+                               int numSamples) :
+                name(nameToUse),
+                buffer(numChannels, numSamples) {
+            DBG (juce::String("Buffer named '") + name + "' constructed. numChannels = "
+                 + juce::String(numChannels) + ", numSamples = " + juce::String(numSamples));
+        }
+
+        ~ReferenceCountedBuffer() {
+            DBG (juce::String("Buffer named '") + name + "' destroyed");
+        }
+
+        juce::AudioSampleBuffer* getAudioSampleBuffer() {
+            return &buffer;
+        }
+
+        int position = 0;
+
     private:
         juce::String name;
         juce::AudioSampleBuffer buffer;
@@ -18,10 +38,24 @@ public:
     };
 
     MainContentComponent() : Thread("Background Thread") {
+        addAndMakeVisible(openButton);
+        openButton.setButtonText("Open...");
+        openButton.onClick = [this] { openButtonClicked(); };
+
+        addAndMakeVisible(clearButton);
+        clearButton.setButtonText("Clear");
+        clearButton.onClick = [this] { clearButtonClicked(); };
+
         setSize(300, 200);
+
+        formatManager.registerBasicFormats();
+        setAudioChannels(0, 2);
+
+        startThread();
     }
 
     ~MainContentComponent() override {
+        stopThread(4000);
         shutdownAudio();
     }
 
@@ -30,7 +64,32 @@ public:
     }
 
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override {
+        auto retainedCurrentBuffer = [&]() -> ReferenceCountedBuffer::Ptr {
+           const juce::SpinLock::ScopedTryLockType lock(mutex);
 
+           if (lock.isLocked())
+               return currentBuffer;
+
+           return nullptr;
+        }();
+
+        if (retainedCurrentBuffer == nullptr) {
+            bufferToFill.clearActiveBufferRegion();
+            return;
+        }
+
+        auto* currentAudioSampleBuffer = retainedCurrentBuffer->getAudioSampleBuffer();
+        auto position = retainedCurrentBuffer->position;
+
+        auto numInputChannels = currentAudioSampleBuffer->getNumChannels();
+        auto numOutputChannels = bufferToFill.buffer->getNumChannels();
+
+        auto outputSamplesRemaining = bufferToFill.numSamples;
+        auto outputSamplesOffset = 0;
+
+        while (outputSamplesRemaining > 0) {
+            
+        }
     }
 
     void releaseResources() override {
@@ -53,6 +112,19 @@ private:
     }
 
 private:
+
+    juce::TextButton openButton;
+    juce::TextButton clearButton;
+
+    std::unique_ptr<juce::FileChooser> chooser;
+
+    juce::AudioFormatManager formatManager;
+    juce::ReferenceCountedArray<ReferenceCountedBuffer> buffers;
+
+    juce::SpinLock mutex;
+    ReferenceCountedBuffer::Ptr currentBuffer;
+    juce::CriticalSection pathMutex;
+    juce::String chosenPath;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)
 };
