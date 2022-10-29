@@ -1,14 +1,16 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(AudioTutorials VERSION 1.0.0)
+project(FFmpegTutorials VERSION 1.0.0)
 
 # C++版本支持
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup()
 
 set(EXAMPLES
-        wav_format
+        metadata
         )
 
 foreach (EXAMPLE ${EXAMPLES})
