@@ -144,11 +144,18 @@ int main(int argc, char* argv[]) {
 
                 // clear screen
                 SDL_SetRenderDrawColor(renderer,
-                                       0xFF,
-                                       0xFF,
-                                       0xFF,
-                                       0xFF);
+                                       0xF0,
+                                       0xF0,
+                                       0xF0,
+                                       0xF0);
                 SDL_RenderClear(renderer);
+
+                SDL_Rect topLeftViewport;
+                topLeftViewport.x = 0;
+                topLeftViewport.y = 0;
+                topLeftViewport.w = kScreenWidth / 2;
+                topLeftViewport.h = kScreenHeight / 2;
+                SDL_RenderSetViewport(renderer, &topLeftViewport);
 
                 // render texture to screen
                 SDL_RenderCopy(renderer,
@@ -156,10 +163,26 @@ int main(int argc, char* argv[]) {
                                nullptr,
                                nullptr);
 
+                SDL_Rect origin;
+                origin.x = 0;
+                origin.y = 0;
+                origin.w = kScreenWidth;
+                origin.h = kScreenHeight;
+                SDL_RenderSetViewport(renderer, &origin);
+
+                static int originX = kScreenWidth / 2;
+                static int originY = kScreenHeight / 2;
+                originX -= 1;
+                originY -= 1;
+                if (originX < 0)
+                    originX = kScreenWidth / 2;
+                if (originY < 0)
+                    originY = kScreenHeight / 2;
+
                 // render red filled quad
                 SDL_Rect fill_rect = {
-                        kScreenWidth / 4,
-                        kScreenHeight / 4,
+                        originY,
+                        originY,
                         kScreenWidth / 2,
                         kScreenHeight / 2};
                 SDL_SetRenderDrawColor(renderer,
@@ -169,6 +192,7 @@ int main(int argc, char* argv[]) {
                                        0xFF);
                 SDL_RenderFillRect(renderer,
                                    &fill_rect);
+
 
                 // render green outlined quad
                 SDL_Rect outline_rect = {

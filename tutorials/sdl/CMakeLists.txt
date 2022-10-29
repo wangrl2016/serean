@@ -10,8 +10,9 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
 set(EXAMPLES
+        color_keying
         get_start
-        sdl_feature
+        texture
         )
 
 foreach (EXAMPLE ${EXAMPLES})

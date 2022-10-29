@@ -1,4 +1,6 @@
 [requires]
+libpng/1.6.38
+libtiff/4.4.0
 sdl/2.24.1
 sdl_image/2.0.5
 
