@@ -65,12 +65,12 @@ public:
 
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override {
         auto retainedCurrentBuffer = [&]() -> ReferenceCountedBuffer::Ptr {
-           const juce::SpinLock::ScopedTryLockType lock(mutex);
+            const juce::SpinLock::ScopedTryLockType lock(mutex);
 
-           if (lock.isLocked())
-               return currentBuffer;
+            if (lock.isLocked())
+                return currentBuffer;
 
-           return nullptr;
+            return nullptr;
         }();
 
         if (retainedCurrentBuffer == nullptr) {
@@ -88,27 +88,119 @@ public:
         auto outputSamplesOffset = 0;
 
         while (outputSamplesRemaining > 0) {
-            
+            auto bufferSamplesRemaining = currentAudioSampleBuffer->getNumSamples() - position;
+            auto samplesThisTime = juce::jmin(outputSamplesRemaining, bufferSamplesRemaining);
+
+            for (auto channel = 0; channel < numOutputChannels; ++channel) {
+                bufferToFill.buffer->copyFrom(channel,
+                                              bufferToFill.startSample + outputSamplesOffset,
+                                              *currentAudioSampleBuffer,
+                                              channel % numInputChannels,
+                                              position,
+                                              samplesThisTime);
+            }
+
+            outputSamplesRemaining -= samplesThisTime;
+            outputSamplesOffset += samplesThisTime;
+            position += samplesThisTime;
+
+            if (position == currentAudioSampleBuffer->getNumSamples())
+                position = 0;
         }
+
+        retainedCurrentBuffer->position = position;
     }
 
     void releaseResources() override {
+        const juce::SpinLock::ScopedLockType lock(mutex);
+        currentBuffer = nullptr;
     }
 
     void resized() override {
+        openButton.setBounds(10, 10, getWidth() - 20, 20);
+        clearButton.setBounds(10, 40, getWidth() - 20, 20);
     }
 
 private:
     void run() override {
+        while (!threadShouldExit()) {
+            checkForPathToOpen();
+            checkForBuffersToFree();
+            wait(500);
+        }
+    }
 
+    void checkForBuffersToFree() {
+        for (auto i = buffers.size(); --i >= 0;) {
+            ReferenceCountedBuffer::Ptr buffer(buffers.getUnchecked(i));
+
+            if (buffer->getReferenceCount() == 2)
+                buffers.remove(i);
+        }
+    }
+
+    void checkForPathToOpen() {
+        juce::String pathToOpen;
+        {
+            const juce::ScopedLock lock(pathMutex);
+            pathToOpen.swapWith(chosenPath);
+        }
+
+        if (pathToOpen.isNotEmpty()) {
+            juce::File file(pathToOpen);
+            std::unique_ptr<juce::AudioFormatReader> reader(formatManager.createReaderFor(file));
+
+            if (reader.get() != nullptr) {
+                auto duration = (float) reader->lengthInSamples / reader->sampleRate;
+
+                if (duration < 2) {
+                    ReferenceCountedBuffer::Ptr newBuffer = new ReferenceCountedBuffer(file.getFileName(),
+                                                                                       (int) reader->numChannels,
+                                                                                       (int) reader->lengthInSamples);
+
+                    reader->read(newBuffer->getAudioSampleBuffer(), 0, (int) reader->lengthInSamples, 0, true, true);
+
+                    {
+                        const juce::SpinLock::ScopedLockType lock(mutex);
+                        currentBuffer = newBuffer;
+                    }
+
+                    buffers.add(newBuffer);
+                } else {
+                    // handle the error that the file is 2 seconds or longer..
+                }
+            }
+        }
     }
 
     void openButtonClicked() {
+        chooser = std::make_unique<juce::FileChooser>("Select a Wave file shorter than 2 seconds to play...",
+                                                      juce::File{},
+                                                      "*.wav");
+        auto chooserFlags = juce::FileBrowserComponent::openMode
+                            | juce::FileBrowserComponent::canSelectFiles;
 
+        chooser->launchAsync(chooserFlags, [this](const juce::FileChooser& fc) {
+            auto file = fc.getResult();
+
+            if (file == juce::File{})
+                return;
+
+            auto path = file.getFullPathName();
+
+
+            {
+                const juce::ScopedLock lock(pathMutex);
+                chosenPath.swapWith(path);
+            }
+
+            notify();
+        });
     }
 
     void clearButtonClicked() {
-        shutdownAudio();
+        const juce::SpinLock::ScopedLockType lock(mutex);
+        currentBuffer = nullptr;
     }
 
 private:

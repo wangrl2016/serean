@@ -30,7 +30,7 @@
 namespace base {
 
 // Returns a value with all bytes in |x| swapped, i.e. reverses the endianness.
-// TODO(pkasting): Once C++23 is available, replace with std::byteswap.
+// TODO: Once C++23 is available, replace with std::byteswap.
     inline BASE_BYTESWAPS_CONSTEXPR uint16_t ByteSwap(uint16_t x) {
 #if defined(COMPILER_MSVC) && !defined(__clang__)
         return _byteswap_ushort(x);
