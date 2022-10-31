@@ -12,20 +12,10 @@ set(EXAMPLES
         advanced_audio_sample
         audio_device_manager
         audio_input
-        audio_level
         audio_player
         audio_sample_buffer
-        decibel_level
-        midi_data
-        midi_event
         midi_synthesiser
-        mpe
-        mpe_zone
-        noise_generator
-        plugin_in
-        wave_synthesiser
         waveform
-        wavetable
         )
 
 foreach (EXAMPLE ${EXAMPLES})
