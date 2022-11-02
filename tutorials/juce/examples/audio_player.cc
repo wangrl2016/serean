@@ -6,6 +6,11 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
+// 代码位置: https://github.com/wangrl2016/serean.git
+// 1. AudioSampleBuffer
+// 2. AudioDeviceManager
+// 3. Waveform
+// 4. MidiSynthesiser
 
 class MainContentComponent : public juce::AudioAppComponent,
                              public juce::ChangeListener {

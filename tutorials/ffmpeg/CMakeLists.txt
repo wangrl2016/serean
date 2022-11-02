@@ -11,6 +11,9 @@ conan_basic_setup()
 
 set(EXAMPLES
         demux
+        demux_decode
+        demux_decode_audio
+        demux_decode_video
         metadata
         )
 
