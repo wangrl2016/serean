@@ -1,4 +1,5 @@
 [requires]
+openjpeg/2.5.0
 ffmpeg/5.0
 
 [generators]
