@@ -10,8 +10,8 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
 set(EXAMPLES
+        media_bitmap
         demux
-        demux_decode
         demux_decode_audio
         demux_decode_video
         metadata
