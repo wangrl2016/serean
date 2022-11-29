@@ -1,5 +1,4 @@
 [requires]
-openjpeg/2.5.0
 ffmpeg/5.0
 
 [generators]
@@ -12,4 +11,3 @@ ffmpeg:with_openh264=False
 ffmpeg:with_openjpeg=False
 ffmpeg:with_opus=False
 ffmpeg:with_vorbis=False
-opencv:with_ffmpeg=False

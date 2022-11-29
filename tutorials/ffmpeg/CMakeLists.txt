@@ -15,7 +15,6 @@ set(EXAMPLES
         demux_decode_audio
         demux_decode_video
         metadata
-        openjpeg_decode
         )
 
 foreach (EXAMPLE ${EXAMPLES})
